@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>会员列表</title>
+	<link href="/css/style.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="/js/jquery.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$(".click").click(function(){
+				$(".tip").fadeIn(200);
+			});
+
+			$(".tiptop a").click(function(){
+				$(".tip").fadeOut(200);
+			});
+
+			$(".sure").click(function(){
+				$(".tip").fadeOut(100);
+			});
+
+			$(".cancel").click(function(){
+				$(".tip").fadeOut(100);
+			});
+		});
+	</script>
+</head>
+<body>
+<div class="place">
+	<span>位置：</span>
+	<ul class="placeul">
+		<li><a href="#">会员管理</a></li>
+		<li><a href="#">会员列表</a></li>
+	</ul>
+</div>
+
+<div class="rightinfo">
+
+
+	<div class="formtitle1"><span>会员列表</span></div>
+<!--	<div th:text="${members}"></div>-->
+	<table class="tablelist" >
+		<!-- 表头增加操作列 -->
+		<thead>
+		<tr>
+			<th>会员ID</th>
+			<th>姓名</th>
+			<th>年龄</th>
+			<th>性别</th>
+			<th>手机号</th>
+			<th>注册时间</th>
+			<th>账户余额</th>
+			<th>操作</th>
+		</tr>
+		</thead>
+		<!-- 数据行保持8列 -->
+		<tbody>
+<!--		<tr th:each="member : ${members}">-->
+		<tr th:each="member : ${pageInfo.list}">
+			<td th:text="${member.memberId}"></td>
+			<td th:text="${member.name}"></td>
+			<td th:text="${member.age}"></td>
+<!--			<td th:text="${member.gender}"></td>-->
+			<td th:text="${member.gender == 'M' ? '男' : '女'}"></td>
+			<td th:text="${member.phone}"></td>
+<!--			<td th:text="${member.registerDate}"></td>-->
+			<td th:text="${#temporals.format(member.registerDate, 'yyyy-MM-dd')}"></td>
+			<td th:text="${member.balance}"></td>
+<!--			<td>-->
+<!--				&lt;!&ndash; 下拉框容器 &ndash;&gt;-->
+<!--				<select class="plan-select" disabled> &lt;!&ndash; disabled 表示只读，根据需求可移除 &ndash;&gt;-->
+<!--					&lt;!&ndash; 遍历会员的健身计划列表 &ndash;&gt;-->
+<!--					&lt;!&ndash; 选项值为计划ID &ndash;&gt;-->
+<!--					<option th:each="plan : ${member.plans}"-->
+<!--							th:value="${plan.planId}"-->
+<!--							th:text="${plan.target + '（' + plan.duration + '周）'}">  &lt;!&ndash; 显示计划目标+周期 &ndash;&gt;-->
+<!--					</option>-->
+<!--					&lt;!&ndash; 无健身计划时的提示 &ndash;&gt;-->
+<!--					<option th:unless="${#lists.size(member.plans) > 0}" value="">无健身计划</option>-->
+<!--				</select>-->
+<!--			</td>-->
+			<td>
+				<a th:href="@{/member/memberupdate(memberId=${member.memberId})}"
+				   class="tablelink">修改</a>
+				<a th:href="@{/member/deletemember(memberId=${member.memberId})}"
+				   class="tablelink">删除</a>
+			</td>
+		</tr>
+		</tbody>
+<!--			<td>-->
+<!--				&lt;!&ndash; 下拉框容器 &ndash;&gt;-->
+<!--				<select class="plan-select" disabled> &lt;!&ndash; disabled 表示只读，根据需求可移除 &ndash;&gt;-->
+<!--					&lt;!&ndash; 遍历会员的健身计划列表 &ndash;&gt;-->
+<!--					&lt;!&ndash; 选项值为计划ID &ndash;&gt;-->
+<!--					<option th:each="plan : ${member.plans}"-->
+<!--							th:value="${plan.planId}"-->
+<!--							th:text="${plan.target + '（' + plan.duration + '周）'}">  &lt;!&ndash; 显示计划目标+周期 &ndash;&gt;-->
+<!--					</option>-->
+<!--					&lt;!&ndash; 无健身计划时的提示 &ndash;&gt;-->
+<!--					<option th:unless="${#lists.size(member.plans) > 0}" value="">无健身计划</option>-->
+<!--				</select>-->
+<!--			</td>-->
+		</tr>
+
+		</tbody>
+	</table>
+	<div class="pagin">
+		<div class="message">
+			共 <i class="blue" th:text="${pageInfo.total}"></i> 条数据，
+			当前第 <i class="blue" th:text="${pageInfo.pageNum}"></i> 页
+		</div>
+		<ul class="paginList">
+			<!-- 上一页按钮 -->
+			<li class="paginItem" th:if="${pageInfo.hasPreviousPage}">
+				<a th:href="@{/member/showmembers(pageNum=${pageInfo.prePage}, pageSize=${pageInfo.pageSize})}">
+					<span class="pagepre"></span>
+				</a>
+			</li>
+
+			<!-- 首页按钮 -->
+			<li class="paginItem" th:if="${pageInfo.pageNum > 3}">
+				<a th:href="@{/member/showmembers(pageNum=1, pageSize=${pageInfo.pageSize})}">1</a>
+			</li>
+
+			<!-- 首页后的省略号 -->
+			<li class="paginItem more" th:if="${pageInfo.pageNum > 4}">
+				<a href="javascript:;">...</a>
+			</li>
+
+			<!-- 中间页码 -->
+			<li class="paginItem"
+				th:each="num : ${pageInfo.navigatepageNums}"
+				th:if="${num >= pageInfo.pageNum - 2 and num <= pageInfo.pageNum + 2}"
+				th:class="${num == pageInfo.pageNum} ? 'paginItem current' : 'paginItem'">
+				<a th:href="@{/member/showmembers(pageNum=${num}, pageSize=${pageInfo.pageSize})}"
+				   th:text="${num}"></a>
+			</li>
+
+			<!-- 末页前的省略号 -->
+			<li class="paginItem more" th:if="${pageInfo.pageNum < pageInfo.pages - 3}">
+				<a href="javascript:;">...</a>
+			</li>
+
+			<!-- 末页按钮 -->
+			<li class="paginItem" th:if="${pageInfo.pageNum < pageInfo.pages - 2}">
+				<a th:href="@{/member/showmembers(pageNum=${pageInfo.pages}, pageSize=${pageInfo.pageSize})}"
+				   th:text="${pageInfo.pages}"></a>
+			</li>
+
+			<!-- 下一页按钮 -->
+			<li class="paginItem" th:if="${pageInfo.hasNextPage}">
+				<a th:href="@{/member/showmembers(pageNum=${pageInfo.nextPage}, pageSize=${pageInfo.pageSize})}">
+					<span class="pagenxt"></span>
+				</a>
+			</li>
+		</ul>
+	</div>
+	<div class="tip">
+		<div class="tiptop"><span>提示信息</span><a></a></div>
+		<div class="tipinfo">
+			<span><img src="../images/ticon.png" /></span>
+			<div class="tipright">
+				<p>是否确认对信息的修改 ？</p>
+				<cite>如果是请点击确定按钮 ，否则请点取消。</cite>
+			</div>
+		</div>
+		<div class="tipbtn">
+			<input name="" type="button"  class="sure" value="确定" />&nbsp;
+			<input name="" type="button"  class="cancel" value="取消" />
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$('.tablelist tbody tr:odd').addClass('odd');
+</script>
+</body>
+</html>

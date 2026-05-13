@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>课程预约</title>
+    <link href="/css/style.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/js/jquery.js"></script>
+</head>
+<body>
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+        <li><a href="#">课程管理</a></li>
+        <li><a href="#">课程预约</a></li>
+    </ul>
+</div>
+
+<div class="formbody">
+    <div class="formtitle"><span>预约课程</span></div>
+    <form id="reservationForm" action="/course/reserve" method="post">
+        <ul class="forminfo">
+            <li><label>课程ID</label><input name="courseId" type="text"
+                                            class="dfinput" th:value="${course.courseId}" readonly /></li>
+            <li><label>课程名称</label><input name="courseName" type="text"
+                                              class="dfinput" th:value="${course.courseName}" readonly /></li>
+            <li><label>教练</label><input name="coachName" type="text"
+                                          class="dfinput" th:value="${course.coachName}" readonly /></li>
+            <li><label>上课时间</label><input name="scheduleTime" type="text"
+                                              class="dfinput" th:value="${course.scheduleTime2}" readonly /></li>
+            <li><label>会员ID</label><input name="memberId" type="text"
+                                            class="dfinput" th:value="${memberId}" readonly /></li>
+            <li><label>预约时间</label><input name="reserveTime" type="text"
+                                              class="dfinput" value="" onclick="WdatePicker({el:this})" /></li>
+            <li><label>&nbsp;</label>
+                <input type="button" class="btn" value="确认预约" onclick="submitForm()" />
+                <input type="button" class="btn" value="返回列表" onclick="history.back()" />
+            </li>
+        </ul>
+    </form>
+</div>
+
+<script type="text/javascript">
+    // 初始化当前日期时间
+    document.querySelector('input[name="reserveTime"]').value =
+        new Date().toISOString().slice(0, 16).replace('T', ' ');
+
+    function submitForm() {
+        if (confirm('确定要预约该课程吗？')) {
+            document.getElementById('reservationForm').submit();
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>添加会员</title>
+<link href="css/style.css" rel="stylesheet" type="text/css" />
+</head>
+<script type="text/javascript" src="/js/jquery.js"></script>
+<script type="text/javascript" src="/js/jquery.idTabs.min.js"></script>
+<script type="text/javascript" src="/js/select-ui.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="/kindeditor/kindeditor-all.js"></script>
+<script charset="utf-8" src="/kindeditor/lang/zh-CN.js"></script>
+<!--日历-->
+<script src="/My97DatePicker/WdatePicker.js"></script>
+<script src="/My97DatePicker/lang/zh-cn.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(e) {
+        $(".select1").uedSelect({
+            width : 345
+        });
+
+    });
+</script>
+<script>
+    var editor;
+    KindEditor.ready(function(K) {
+        editor = K.create('textarea[name="emercontactperson"]', {
+            allowFileManager : true
+        });
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/wangeditor@latest/dist/wangEditor.min.js"></script>
+<script>
+    // 计划索引计数器
+    let planIndex = 1;
+    // 添加计划
+    function addPlan() {
+        const template = `
+            &lt;div class="plan-item" data-index="${planIndex}">
+                &lt;div style="margin-bottom: 10px;">
+                    &lt;select name="plans[${planIndex}].target" class="dfinput" style="width:120px;">
+                        &lt;option value="减脂">减脂&lt;/option>
+                        &lt;option value="增肌">增肌&lt;/option>
+                    &lt;/select>
+                    &lt;input type="number" name="plans[${planIndex}].duration"
+                           placeholder="周期（周）" class="dfinput" style="width:100px;">
+                    &lt;button type="button" class="btn-mini" onclick="removePlan(this)">删除&lt;/button>
+                &lt;/div>
+                &lt;textarea name="plans[${planIndex}].planDetails" class="editor"></textarea>
+            </div>
+        `;
+
+        const container = document.getElementById('plansContainer');
+        const div = document.createElement('div');
+        div.innerHTML = template;
+        container.appendChild(div.firstElementChild);
+
+        // 初始化编辑器
+        initEditor(div.querySelector('textarea'));
+        planIndex++;
+    }
+
+    // 删除计划
+    function removePlan(btn) {
+        const item = btn.closest('.plan-item');
+        item.remove();
+    }
+
+    // 初始化富文本编辑器
+    function initEditor(textarea) {
+        const editor = new wangEditor(textarea);
+        editor.config.uploadImgShowBase64 = true;
+        editor.create();
+    }
+
+    // 初始化第一个编辑器
+    document.querySelectorAll('.editor').forEach(initEditor);
+</script>
+<body>
+	<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+    <li><a href="#">会员管理</a></li>
+    <li><a href="#">添加会员</a></li>
+    </ul>
+    </div>
+    <div class="formbody">
+        <div class="formtitle"><span>基本信息</span></div>
+    <!-- 设置请求以及表单提交路径-->
+    <form action="/member/addmember" method="get">
+        <ul class="forminfo">
+        <li><label>会员ID</label><input name="memberId" type="text" class="dfinput" /> </li>
+        <li><label>姓名</label><input name="name" type="text" class="dfinput" /> </li>
+        <li><label>年龄</label><input name="age" type="text" class="dfinput" /></li>
+        <li>
+            <label>性别</label><cite>
+            <input name="gender" type="radio" value="男" checked="checked" />男&nbsp;&nbsp;&nbsp;&nbsp;
+            <input name="gender" type="radio" value="女" />女</cite>
+        </li>
+        <li><label>手机号</label><input name="phone" type="text" class="dfinput" /></li>
+        <li>
+            <!--日历插件官网 http://my97.net/demo/index.htm-->
+            <label>注册时间</label>
+            <input name="registerDate" type="text" class="dfinput" onclick="WdatePicker({el:this})" />
+        </li>
+        <li><label>账户余额</label><input name="balance" type="text" class="dfinput" /></li>
+        <li><label>健身计划</label></li><li>
+            <div id="plansContainer">
+                <!-- 初始计划模板 -->
+                <div class="plan-item" data-index="0">
+                    <div style="margin-bottom: 10px;">
+                        <select name="plans[0].target" class="dfinput" style="width:120px;">
+                            <option value="减脂">减脂</option>
+                            <option value="增肌">增肌</option>
+                        </select>
+                        <input type="number" name="plans[0].duration"
+                               placeholder="周期（周）" class="dfinput" style="width:100px;">
+                        <button type="button" class="btn-mini" onclick="removePlan(this)">删除</button>
+                    </div>
+                    <textarea name="plans[0].planDetails" class="editor"></textarea>
+                </div>
+            </div>
+            <button type="button" class="btn" onclick="addPlan()"
+                    style="margin-top:10px;">+ 添加计划</button>
+        </li>
+        <li><label>&nbsp;</label><input name="" type="submit" class="btn" value="确认保存"/></li>
+        </ul>
+    </form>
+    </div>
+</body>
+</html>

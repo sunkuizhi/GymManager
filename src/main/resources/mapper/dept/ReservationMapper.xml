@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.test.GymManager.mapper.ReservationMapper">
+
+    <select id="getReservations" resultType="com.test.GymManager.entity.Reservation">
+        select * from reservation where 1=1
+        <if test="memberId !=null ">
+            and member_id = #{memberId}
+        </if>
+        <if test="courseId != null ">
+            and course_id = #{courseId}
+        </if>
+    </select>
+</mapper>
+        <!-- Reservation实体的基础映射 -->
+        <!-- <resultMap id="BaseReservationMap" type="com.test.GymManager.entity.Reservation"> -->
+        <!--     &lt;!&ndash; 主键映射 &ndash;&gt; -->
+        <!--     <id column="reservation_id" property="reservationId" jdbcType="BIGINT"/> -->
+        <!--     &lt;!&ndash; 普通字段映射 &ndash;&gt; -->
+        <!--     <result column="member_id" property="memberId" jdbcType="BIGINT"/> -->
+        <!--     <result column="course_id" property="courseId" jdbcType="BIGINT"/> -->
+        <!--     <result column="reserve_time" property="reserveTime" jdbcType="DATETIME"/> -->
+        <!--     <result column="status" property="status" jdbcType="TINYINT"/> -->
+        <!-- </resultMap> -->

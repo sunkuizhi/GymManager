@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>课程列表</title>
+    <link href="/css/style.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/js/jquery.js"></script>
+</head>
+<body>
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+        <li><a href="#">课程管理</a></li>
+        <li><a href="#">课程列表</a></li>
+    </ul>
+</div>
+<div class="rightinfo">
+    <div class="formtitle1"><span>可预约课程</span></div>
+    <table class="tablelist">
+        <thead>
+        <tr>
+            <th>课程ID</th>
+            <th>课程名称</th>
+            <th>教练</th>
+            <th>上课时间</th>
+            <th>最大人数</th>
+            <th>当前人数</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="course : ${pageInfo.list}">
+            <td th:text="${course.courseId}"></td>
+            <td th:text="${course.courseName}"></td>
+            <td th:text="${course.coachName}"></td>
+<!--            <td th:text="${course.coach?.name ?: '未知'}"></td>-->
+            <td th:text="${course.scheduleTime2}"></td>
+            <td th:text="${course.maxCapacity}"></td>
+            <td th:text="${course.currentCount}"></td>
+            <td>
+                <a th:href="@{/course/reserve/{courseId}(courseId=${course.courseId})}"
+                   class="tablelink">预约</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <!-- 分页导航 -->
+    <div class="pagin">
+        <div class="message">
+            共 <i class="blue" th:text="${pageInfo.total}"></i> 条数据，
+            当前第 <i class="blue" th:text="${pageInfo.pageNum}"></i> 页
+        </div>
+        <ul class="paginList">
+            <!-- 上一页按钮 -->
+            <li class="paginItem" th:if="${pageInfo.hasPreviousPage}">
+                <a th:href="@{/course/showcourses(pageNum=${pageInfo.prePage}, pageSize=${pageInfo.pageSize})}">
+                    <span class="pagepre"></span>
+                </a>
+            </li>
+
+            <!-- 首页按钮 -->
+            <li class="paginItem" th:if="${pageInfo.pageNum > 3}">
+                <a th:href="@{/course/showcourses(pageNum=1, pageSize=${pageInfo.pageSize})}">1</a>
+            </li>
+
+            <!-- 首页后的省略号 -->
+            <li class="paginItem more" th:if="${pageInfo.pageNum > 4}">
+                <a href="javascript:;">...</a>
+            </li>
+
+            <!-- 中间页码 -->
+            <li class="paginItem"
+                th:each="num : ${pageInfo.navigatepageNums}"
+                th:if="${num >= pageInfo.pageNum - 2 and num <= pageInfo.pageNum + 2}"
+                th:class="${num == pageInfo.pageNum} ? 'paginItem current' : 'paginItem'">
+                <a th:href="@{/course/showcourses(pageNum=${num}, pageSize=${pageInfo.pageSize})}"
+                   th:text="${num}"></a>
+            </li>
+
+            <!-- 末页前的省略号 -->
+            <li class="paginItem more" th:if="${pageInfo.pageNum < pageInfo.pages - 3}">
+                <a href="javascript:;">...</a>
+            </li>
+
+            <!-- 末页按钮 -->
+            <li class="paginItem" th:if="${pageInfo.pageNum < pageInfo.pages - 2}">
+                <a th:href="@{/course/showcourses(pageNum=${pageInfo.pages}, pageSize=${pageInfo.pageSize})}"
+                   th:text="${pageInfo.pages}"></a>
+            </li>
+
+            <!-- 下一页按钮 -->
+            <li class="paginItem" th:if="${pageInfo.hasNextPage}">
+                <a th:href="@{/course/showcourses(pageNum=${pageInfo.nextPage}, pageSize=${pageInfo.pageSize})}">
+                    <span class="pagenxt"></span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+<script type="text/javascript">
+    $('.tablelist tbody tr:odd').addClass('odd');
+</script>
+</body>
+</html>

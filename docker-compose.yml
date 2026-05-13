@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: gymmanager-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root123          # 请根据需要修改
+      MYSQL_DATABASE: gymmanager
+      MYSQL_USER: gymuser
+      MYSQL_PASSWORD: gympass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # 如果需要自动执行 SQL 初始化脚本，将 init.sql 放在当前目录，取消下面注释
+      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  app:
+    build: .
+    container_name: gymmanager-app
+    restart: always
+    depends_on:
+      - mysql
+    ports:
+      - "8080:8080"
+    environment:
+      # 覆盖 application.yml 中的数据库连接
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/gymmanager?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root123
+      # 可选：设置日志级别
+      LOGGING_LEVEL_COM_TEST_GYMMANAGER_MAPPER: debug
+    volumes:
+      - ./logs:/app/logs                     # 日志持久化到当前目录的 logs 文件夹
+      # - ./static_uploads:/app/static       # 如果项目有上传文件功能，取消注释
+
+volumes:
+  mysql_data:

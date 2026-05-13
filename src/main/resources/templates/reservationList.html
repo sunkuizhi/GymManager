@@ -1,0 +1,164 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>预约列表</title>
+    <link href="/css/style.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $(".click").click(function(){
+                $(".tip").fadeIn(200);
+            });
+
+            $(".tiptop a").click(function(){
+                $(".tip").fadeOut(200);
+            });
+
+            $(".sure").click(function(){
+                $(".tip").fadeOut(100);
+            });
+
+            $(".cancel").click(function(){
+                $(".tip").fadeOut(100);
+            });
+        });
+    </script>
+</head>
+<body>
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+        <li><a href="#">预约管理</a></li>
+        <li><a href="#">预约列表</a></li>
+    </ul>
+</div>
+<div class="rightinfo">
+    <form action="/reservation/multyFind" method="get">
+        <ul class="prosearch">
+            <li>
+                <label>查询：</label>
+                <i>会员编号</i>
+                <a>
+                    <input name="memberIid" type="Long" class="scinput" />
+                </a>
+                <i>课程编号</i>
+                <a>
+                    <input name="courseId" type="Long" class="scinput" />
+                </a>
+            </li>
+            <input name="" type="submit" class="sure" value="查询" />
+        </ul>
+    </form>
+    <div class="formtitle1"><span>预约列表</span></div>
+    <table class="tablelist">
+        <thead>
+        <tr>
+            <th>预约ID</th>
+            <th>会员姓名</th>
+            <th>课程名称</th>
+            <th>预约时间</th>
+            <th>状态</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="reservation : ${pageInfo.list}">
+            <td th:text="${reservation.reservationId}"></td>
+            <td th:text="${reservation.memberName}"></td>
+            <td th:text="${reservation.courseName}"></td>
+<!--            <td th:text="${#dates.format(reservation.reserveTime, 'yyyy-MM-dd HH:mm')}"></td>-->
+            <td th:text="${reservation.reserveTime2}"></td>
+            <td th:text="${reservation.status == 0 ? '未签到' : '已签到'}"></td>
+            <td>
+                <button type="button" class="btn-mini"
+                        th:if="${reservation.status == 0}"
+                        th:onclick="|checkIn(${reservation.reservationId})|">
+                签到
+                </button>
+                <span th:if="${reservation.status == 1}" style="color:green;">已完成</span>
+<!--                                        th:onclick="'checkIn(' + ${reservation.reservationId} + ')'">-->
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+<!--    /reservation-->
+    <div class="pagin">
+        <div class="message">
+            共 <i class="blue" th:text="${pageInfo.total}"></i> 条数据，
+            当前第 <i class="blue" th:text="${pageInfo.pageNum}"></i> 页
+        </div>
+        <ul class="paginList">
+            <!-- 上一页按钮 -->
+            <li class="paginItem" th:if="${pageInfo.hasPreviousPage}">
+                <a th:href="@{/reservation/showreservations(pageNum=${pageInfo.prePage}, pageSize=${pageInfo.pageSize})}">
+                    <span class="pagepre"></span>
+                </a>
+            </li>
+
+            <!-- 首页按钮 -->
+            <li class="paginItem" th:if="${pageInfo.pageNum > 3}">
+                <a th:href="@{/reservation/showreservations(pageNum=1, pageSize=${pageInfo.pageSize})}">1</a>
+            </li>
+
+            <!-- 首页后的省略号 -->
+            <li class="paginItem more" th:if="${pageInfo.pageNum > 4}">
+                <a href="javascript:;">...</a>
+            </li>
+
+            <!-- 中间页码 -->
+            <li class="paginItem"
+                th:each="num : ${pageInfo.navigatepageNums}"
+                th:if="${num >= pageInfo.pageNum - 2 and num <= pageInfo.pageNum + 2}"
+                th:class="${num == pageInfo.pageNum} ? 'paginItem current' : 'paginItem'">
+                <a th:href="@{/reservation/showreservations(pageNum=${num}, pageSize=${pageInfo.pageSize})}"
+                   th:text="${num}"></a>
+            </li>
+
+            <!-- 末页前的省略号 -->
+            <li class="paginItem more" th:if="${pageInfo.pageNum < pageInfo.pages - 3}">
+                <a href="javascript:;">...</a>
+            </li>
+
+            <!-- 末页按钮 -->
+            <li class="paginItem" th:if="${pageInfo.pageNum < pageInfo.pages - 2}">
+                <a th:href="@{/reservation/showreservations(pageNum=${pageInfo.pages}, pageSize=${pageInfo.pageSize})}"
+                   th:text="${pageInfo.pages}"></a>
+            </li>
+
+            <!-- 下一页按钮 -->
+            <li class="paginItem" th:if="${pageInfo.hasNextPage}">
+                <a th:href="@{/reservation/showreservations(pageNum=${pageInfo.nextPage}, pageSize=${pageInfo.pageSize})}">
+                    <span class="pagenxt"></span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $('.tablelist tbody tr:odd').addClass('odd');
+    function checkIn(reservationId) {
+        if (confirm('确定要为该预约签到吗？')) {
+            $.ajax({
+                url: '/reservation/checkIn',
+                method: 'POST',
+                data: { reservationId: reservationId },
+                success: function(result) {
+                    if (result.code === 200) {
+                        alert('签到成功');
+                        location.reload(); // 刷新页面
+                    } else {
+                        alert(result.message);
+                    }
+                },
+                error: function() {
+                    alert('签到失败，请重试');
+                }
+            });
+        }
+    }
+</script>
+</body>
+</html>

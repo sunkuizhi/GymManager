@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.test.GymManager.mapper.MemberMapper">
+
+    <!-- 定义基础字段映射 -->
+    <resultMap id="BaseMemberMap" type="com.test.GymManager.entity.Member">
+        <id column="member_id" property="memberId" jdbcType="BIGINT"/>
+        <result column="name" property="name"/>
+        <result column="age" property="age"/>
+        <result column="gender" property="gender"/>
+        <result column="phone" property="phone"/>
+        <result column="register_date" property="registerDate"/>
+        <result column="balance" property="balance"/>
+    </resultMap>
+
+    <!-- 包含健身计划的完整映射 -->
+    <resultMap id="MemberWithPlansMap" type="com.test.GymManager.entity.Member" extends="BaseMemberMap">
+        <collection property="plans" ofType="com.test.GymManager.entity.FitnessPlan">
+            <id column="plan_id" property="planId"/>
+            <result column="target" property="target"/>
+            <result column="duration" property="duration"/>
+            <result column="plan_details" property="planDetails"/>
+        </collection>
+    </resultMap>
+
+    <!-- 根据ID查询会员及健身计划 -->
+    <select id="getMember" resultMap="MemberWithPlansMap">
+        SELECT
+            m.member_id,
+            m.name,
+            m.age,
+            m.gender,
+            m.phone,
+            m.register_date,
+            m.balance,
+            p.plan_id,
+            p.target,
+            p.duration,
+            p.plan_details
+        FROM member m
+        LEFT JOIN fitness_plan p ON m.member_id = p.member_id
+        WHERE m.member_id = #{memberId}
+    </select>
+
+    <!-- 动态条件查询 -->
+    <select id="selectMembers" resultMap="MemberWithPlansMap">
+        SELECT
+        m.*,
+        p.plan_id,
+        p.target,
+        p.duration,
+        p.plan_details
+        FROM member m
+        LEFT JOIN fitness_plan p ON m.member_id = p.member_id
+        <where>
+            <if test="name != null and name != ''">
+                AND m.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="gender != null and gender != ''">
+                AND m.gender = #{gender}
+            </if>
+            <if test="minAge != null">
+                AND m.age >= #{minAge}
+            </if>
+            <if test="maxAge != null">
+                AND m.age &lt;= #{maxAge}
+            </if>
+            <if test="phone != null and phone != ''">
+                AND m.phone = #{phone}
+            </if>
+            <if test="startDate != null">
+                AND m.register_date >= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND m.register_date &lt;= #{endDate}
+            </if>
+        </where>
+        ORDER BY m.register_date DESC
+    </select>
+
+    <!-- 更新会员信息 -->
+    <update id="updateMember">
+        UPDATE member
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="age != null">age = #{age},</if>
+            <if test="gender != null">gender = #{gender},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="balance != null">balance = #{balance},</if>
+        </set>
+        WHERE member_id = #{memberId}
+    </update>
+
+</mapper>
