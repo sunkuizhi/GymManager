@@ -40,13 +40,19 @@ cd GymManager
 - 修改 `application.yml` 中的数据库连接信息（用户名、密码等）
 
 ### 3. 启动后端
-
+#### 方式一：本地 Maven 运行
 ```bash
 mvn clean install
 mvn spring-boot:run
 ```
 后端启动后默认监听 `8080` 端口，上下文路径为 `/`。
 
+#### 方式二：Docker 运行（推荐）
+确保已安装 Docker 和 Docker Compose，然后执行：
+```bash
+docker-compose up -d
+```
+该命令会自动启动 MySQL 容器和应用容器，并配置好网络连接。
 ### 4. 访问系统
 
 打开浏览器访问：`http://localhost:8080`
@@ -93,6 +99,28 @@ GymManager/
 - 若使用 Swagger 接口文档，启动后访问：`http://localhost:8080/swagger-ui/index.html`
 - 日志配置文件为 `logback.xml`，可按需调整日志级别和输出路径。
 
+## Docker 部署说明
+
+### 构建镜像
+
+```bash
+mvn clean package   # 生成 JAR 包
+docker build -t gymmanager:latest .
+```
+### 使用 Docker Compose 一键启动
+项目根目录已提供 docker-compose.yml，包含 MySQL 和应用服务：
+```bash
+docker-compose up -d
+```
+- 数据卷 `mysql_data` 持久化数据库文件
+- 日志文件挂载到 `./logs` 目录
+- 可通过修改环境变量覆盖数据库连接参数
+### 停止和清理
+
+```bash
+docker-compose down        # 停止容器，保留数据卷
+docker-compose down -v     # 停止并删除数据卷（数据库数据会丢失）
+```
 ## 开发调试建议
 
 - 推荐使用 IntelliJ IDEA，直接导入 Maven 项目。
@@ -101,5 +129,4 @@ GymManager/
 - 如果遇到数据库连接错误，请检查 MySQL 服务是否启动以及 `application.yml` 中的连接参数是否正确。
 
 ## 许可证
-
 [待补充]
